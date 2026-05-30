@@ -1,23 +1,44 @@
 package ro.tuiasi.pp.lab7
 
-import java.nio.file.Path
+import java.io.File
 
 fun main() {
-    val path = Path.of("history.log")
-    if (!path.toFile().exists()) {
-        println("Fisierul history.log nu exista in directorul proiectului.")
-        println("Copiaza-l local conform instructiunilor din ASSIGNMENT.md.")
+    val file = File("history.log")
+
+    if (!file.exists()) {
+        println("Fișierul 'history.log' nu a fost găsit. Asigură-te că ai rulat: cp history.sample.log history.log")
         return
     }
 
-    // TODO: Parsează ultimele 50 de intrări din fișier folosind HistoryParser.parseLastEntries()
+    val logContent = file.readText()
 
-    // TODO: Construiește HashMap-ul timestamp -> HistoryLogRecord folosind HistoryParser.toMutableMap()
+    val logMap = HistoryParser.parseLogContent(logContent)
 
-    // TODO: Afișează numărul de intrări parsate și numărul de elemente din map
+    println("Au fost procesate cu succes ${logMap.size} intrări și salvate în MutableHashMap.\n")
+    println("-".repeat(40))
 
-    // TODO: Dacă există cel puțin două înregistrări, folosește GenericOps.maxOfTwo()
-    //       pentru a determina cea mai recentă dintre primele două și afișeaz-o
 
-    // TODO (opțional): Testează GenericOps.searchAndReplace() pe map-ul creat
+    if (logMap.size >= 2) {
+        val valuesList = logMap.values.toList()
+        val record1 = valuesList[0]
+        val record2 = valuesList[1]
+
+
+        val maxRecord = getMaxRecord(record1, record2)
+        println("TEST FUNCȚIE MAXIM:")
+        println("Record A: $record1")
+        println("Record B: $record2")
+        println("=> Cel mai recent (maximul) este: $maxRecord\n")
+
+
+        val dummyRecord = HistoryLogRecord(999999999L, "apt-get install inlocuire-test")
+        println("TEST CĂUTARE ȘI ÎNLOCUIRE:")
+        println("Căutăm: $record1")
+        println("Înlocuim cu: $dummyRecord")
+
+        findAndReplace(searchFor = record1, replaceWith = dummyRecord, map = logMap)
+
+        val isReplaced = logMap.containsValue(dummyRecord)
+        println("=> Obiectul a fost înlocuit cu succes în dicționar: $isReplaced")
+    }
 }
